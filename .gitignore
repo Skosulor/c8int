@@ -2,4 +2,4 @@ games
 PONG
 chip8.o
 emu.o
-
+output
