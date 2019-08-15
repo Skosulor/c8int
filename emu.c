@@ -7,6 +7,13 @@ int main(){
   load_game();
   print_memory();
 
+
+  fetch_next_op();
+  decode_op();
+  fetch_next_op();
+  decode_op();
+  fetch_next_op();
+  decode_op();
   fetch_next_op();
   decode_op();
   fetch_next_op();
