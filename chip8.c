@@ -6,7 +6,7 @@
 void load_game(){
   uint16_t mem_ptr = 0;
   FILE *fptr;
-  char game_file[10] = "test";
+  char game_file[10] = "pdemo";
   char ch;
 
   fptr = fopen(game_file, "rb");
@@ -31,7 +31,6 @@ void init(){
   i_reg = 0;
   op_code = 0;
   sp = 0;
-  // TODO: load fontset
   for(i = 0; i < FONTSET_SIZE; i++){
     memory[i + FONTSET_OFFSET] = c8_fontset[i];
   }
@@ -84,8 +83,8 @@ void case_0(){
       printf("Error, uknown op_code: %X, case_0\n" , op_code);
   }
 
-} // DONE
-void case_8(uint8_t x, uint8_t y, uint8_t n){     // DONE
+}
+void case_8(uint8_t x, uint8_t y, uint8_t n){
   switch(n)
     {
     case 0x0: V[x]  = V[y];        break;
@@ -101,6 +100,7 @@ void case_8(uint8_t x, uint8_t y, uint8_t n){     // DONE
 }
 
 void case_E(){     // TODO Rquires input
+  pc +=2;
 }
 
 void get_bcd(uint8_t x){
@@ -131,11 +131,29 @@ void case_F(uint8_t x, uint8_t nn){
     case 0x15: delay_timer = V[x];   break;
     case 0x18: sound_timer = V[x];   break;
     case 0x1E: i_reg = i_reg + V[x]; break;
-    case 0x29: i_reg = 0x50 + x*5;   break; 
+    case 0x29: i_reg = 0x50 + x*5;   break;
     case 0x33: get_bcd(x);    break;
     case 0x55: store_regs(x); break;
     case 0x65: read_regs(x);  break;
     }
+}
+
+void draw_pixels(uint8_t x, uint8_t y, uint8_t n){
+  // draw sprite at coordinate (vx, vy)
+  // height of n, width of 8
+  // pixels read from mem location i_reg
+  int i,j;
+  bool old_p;
+  for(i = 0; i < n; i ++){
+    for(j = 0; j < 8; j++){
+      old_p = pixel[V[x]+j][V[y]+i];
+      pixel[V[x]+j][V[y]+i] = (pixel[V[x]+j][V[y]+i] & 0x01) ^
+                               ((memory[i_reg+i]) & 0x80 >> j);
+      if((old_p == 1) && (pixel[V[x]+j][V[y]+i] == 0))
+        V[0xF] = 1;
+    }
+  }
+  print_pixel();
 }
 
 void decode_op(){
@@ -145,7 +163,7 @@ void decode_op(){
   uint8_t  nn  = GET_NN(op_code);
   uint16_t nnn = GET_NNN(op_code);
 
-  printf("pc: %x, op: %x, x: %x, y: %x, nnn: %x, nn: %x, n: %x\n", pc, op_code, x, y, nnn, nn, n);
+  printf("pc: %x, op: %x, x: %x, y: %x, nnn: %x, nn: %x, n: %x\n", pc-2, op_code, x, y, nnn, nn, n);
 
   switch(op_code & 0xF000)
     {
@@ -162,15 +180,30 @@ void decode_op(){
     case 0xA000: i_reg = nnn;                    break;
     case 0xB000: pc = V[0] + nnn;                break;
     case 0xC000: V[x] = (random() % 255) & nn;   break;
-
-    case 0xD000:
-      // draw(Vx,Vy,N) TODO
-      break;
-
+    case 0xD000: draw_pixels(x,y,n); break;
     case 0xE000: case_E(); break;
     case 0xF000: case_F(x,nn); break;
-
     default:
       printf("Error, uknown op_code: %X, main switch\n" , op_code);
+    }
+}
+
+void print_pixel(){
+  int i,j;
+  for(i = 0; i < NEW_PAGE; i++){
+    printf("\n");
   }
+
+  for(i = 0; i < H_PIXELS; i++){
+    for(j = 0; j < W_PIXELS; j++){
+
+      if(pixel[i][j])
+        printf("X");
+      else
+        printf("_");
+    }
+    printf("\n");
+  }
+
+  for(int j = 0; j < 1000000; j++){}
 }
