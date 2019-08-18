@@ -1,3 +1,7 @@
+
+// TODO!!! Implement delayed timer, sound timer and keypad
+// also debug the shit out of it
+
 #include <stdlib.h>
 #include <time.h>
 #include <stdio.h>
@@ -6,7 +10,7 @@
 void load_game(){
   uint16_t mem_ptr = 0;
   FILE *fptr;
-  char game_file[10] = "pdemo";
+  char game_file[30] = "test_opcode.ch8";
   char ch;
 
   fptr = fopen(game_file, "rb");
@@ -35,6 +39,10 @@ void init(){
     memory[i + FONTSET_OFFSET] = c8_fontset[i];
   }
   srandom(time(NULL));
+  clear_display();
+  for(i = 0; i < 16; i++){
+    V[i] = 0;
+  }
 }
 
 void print_memory(){
@@ -163,7 +171,7 @@ void decode_op(){
   uint8_t  nn  = GET_NN(op_code);
   uint16_t nnn = GET_NNN(op_code);
 
-  printf("pc: %x, op: %x, x: %x, y: %x, nnn: %x, nn: %x, n: %x\n", pc-2, op_code, x, y, nnn, nn, n);
+  /* printf("pc: %x, op: %x, x: %x, y: %x, nnn: %x, nn: %x, n: %x\n", pc-2, op_code, x, y, nnn, nn, n); */
 
   switch(op_code & 0xF000)
     {
@@ -189,7 +197,9 @@ void decode_op(){
 }
 
 void print_pixel(){
-  int i,j;
+  int i,j,d;
+  uint16_t temp_op_code;
+  d = -10;
   for(i = 0; i < NEW_PAGE; i++){
     printf("\n");
   }
@@ -202,8 +212,24 @@ void print_pixel(){
       else
         printf("_");
     }
+
+    if(DEBUG){
+      temp_op_code = (memory[pc+d] << 8) | memory[pc+d+1];
+      if(i <=15)
+        printf("  |   V%x: %X", i, V[i]);
+      else if(pc+d == pc){
+        printf("  |   addr: %x, op: %X  <----", pc+d,  temp_op_code);
+        d+=2;
+        }
+      else{
+        printf("  |   addr: %x, op: %X", pc+d,  temp_op_code);
+        d+=2;
+      }
+    }
+
     printf("\n");
   }
 
-  for(int j = 0; j < 1000000; j++){}
+  for(int j = 0; j < 100000000; j++){}
 }
+

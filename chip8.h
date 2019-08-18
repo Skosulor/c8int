@@ -16,6 +16,8 @@
 #define FONTSET_SIZE   80
 #define NEW_PAGE       120
 
+#define DEBUG 1
+
 /* Instruction masking
    0XYN
    0XNN
