@@ -5,17 +5,19 @@
 #include <stdlib.h>
 #include <time.h>
 #include <stdio.h>
+#include <sys/time.h>
 #include "chip8.h"
 
-void load_game(){
+void load_game(char rom[]){
   uint16_t mem_ptr = 0;
   FILE *fptr;
-  char game_file[30] = "test_opcode.ch8";
+  /* char game_file[30] = TEST6; */
   char ch;
 
-  fptr = fopen(game_file, "rb");
+  fptr = fopen(rom, "rb");
   if(fptr==NULL){
-    printf("No such game");
+    printf("%s\n", rom);
+    printf("No such game\n");
     exit(0);
   }
 
@@ -72,6 +74,26 @@ void clear_display(){
   }
 }
 
+void update_timer(){
+  uint64_t delta_us;
+  static struct timespec last, current;
+  if(delay_timer == 0){
+    clock_gettime(CLOCK_MONOTONIC_RAW, &last);
+  }
+  else if(delay_timer > 0){
+    clock_gettime(CLOCK_MONOTONIC_RAW, &current);
+    delta_us = (current.tv_sec - last.tv_sec) * 1000000 + (current.tv_nsec - last.tv_nsec) / 1000;
+
+    if(delta_us > 16666){
+      delay_timer -= 1;
+      clock_gettime(CLOCK_MONOTONIC_RAW, &last);
+    }
+  }
+  else{
+    printf("Error updating delay timer, timer value = x%X\n", delay_timer);
+    while(1){}
+  }
+}
 
 void case_0(){
   switch(op_code & 0x00FF)
@@ -134,15 +156,15 @@ void read_regs(uint8_t to_reg){
 void case_F(uint8_t x, uint8_t nn){
   switch(nn)
     {
-    case 0x07: V[x] = delay_timer;   break;
+    case 0x07: V[x] = delay_timer;    break;
     case 0x0A: break; // TODO wait for keypress, delay all execution
-    case 0x15: delay_timer = V[x];   break;
-    case 0x18: sound_timer = V[x];   break;
-    case 0x1E: i_reg = i_reg + V[x]; break;
-    case 0x29: i_reg = 0x50 + x*5;   break;
-    case 0x33: get_bcd(x);    break;
-    case 0x55: store_regs(x); break;
-    case 0x65: read_regs(x);  break;
+    case 0x15: delay_timer = V[x];    break;
+    case 0x18: sound_timer = V[x];    break;
+    case 0x1E: i_reg = i_reg + V[x];  break;
+    case 0x29: i_reg = 0x50 + V[x]*5; break;
+    case 0x33: get_bcd(x);            break;
+    case 0x55: store_regs(x);         break;
+    case 0x65: read_regs(x);          break;
     }
 }
 
@@ -152,13 +174,31 @@ void draw_pixels(uint8_t x, uint8_t y, uint8_t n){
   // pixels read from mem location i_reg
   int i,j;
   bool old_p;
+
+  V[0xF] = 0;
+
   for(i = 0; i < n; i ++){
     for(j = 0; j < 8; j++){
       old_p = pixel[V[x]+j][V[y]+i];
-      pixel[V[x]+j][V[y]+i] = (pixel[V[x]+j][V[y]+i] & 0x01) ^
-                               ((memory[i_reg+i]) & 0x80 >> j);
-      if((old_p == 1) && (pixel[V[x]+j][V[y]+i] == 0))
-        V[0xF] = 1;
+
+      if(((memory[i_reg+i]) & (0x80 >> j)) == 0){
+        /* pixel[V[x]+j][V[y]+i] = FALSE; */
+        if(old_p == TRUE)
+          V[0xF] = 1;
+      }
+      else{
+        if(old_p == TRUE){
+          pixel[V[x]+j][V[y]+i] = FALSE;
+          V[0xF] = 1;
+        }
+        else
+          pixel[V[x]+j][V[y]+i] = TRUE;
+
+        /* pixel[V[x]+j][V[y]+i] ^= 1; */
+        /* if((old_p == 1) && (pixel[V[x]+j][V[y]+i] == 0)) */
+        /*   V[0xF] = 1; */
+
+      }
     }
   }
   print_pixel();
@@ -181,24 +221,27 @@ void decode_op(){
     case 0x3000: if(V[x] == nn){ pc +=2; }       break;
     case 0x4000: if(V[x] != nn){ pc += 2; }      break;
     case 0x5000: if(V[x] == V[y]){ pc += 2;}     break;
-    case 0x6000: V[x] == nn;                     break;
+    case 0x6000: V[x] = nn;                      break;
     case 0x7000: V[x] +=  nn;                    break;
     case 0x8000: case_8(x,y,n);                  break;
     case 0x9000: if(V[x] != V[y]){ pc+=2; }      break;
     case 0xA000: i_reg = nnn;                    break;
     case 0xB000: pc = V[0] + nnn;                break;
     case 0xC000: V[x] = (random() % 255) & nn;   break;
-    case 0xD000: draw_pixels(x,y,n); break;
-    case 0xE000: case_E(); break;
-    case 0xF000: case_F(x,nn); break;
+    case 0xD000: draw_pixels(x,y,n);             break;
+    case 0xE000: case_E();                       break;
+    case 0xF000: case_F(x,nn);                   break;
     default:
       printf("Error, uknown op_code: %X, main switch\n" , op_code);
+      while(1){}
     }
 }
 
 void print_pixel(){
+
   int i,j,d;
   uint16_t temp_op_code;
+  unsigned char block = 127;
   d = -10;
   for(i = 0; i < NEW_PAGE; i++){
     printf("\n");
@@ -207,16 +250,19 @@ void print_pixel(){
   for(i = 0; i < H_PIXELS; i++){
     for(j = 0; j < W_PIXELS; j++){
 
-      if(pixel[i][j])
-        printf("X");
+      if(pixel[j][i])
+        printf("%c", block);
       else
-        printf("_");
+        printf(" ");
     }
 
-    if(DEBUG){
+    if(debug){
       temp_op_code = (memory[pc+d] << 8) | memory[pc+d+1];
       if(i <=15)
         printf("  |   V%x: %X", i, V[i]);
+      else if(i == 16){
+        printf("  |   I reg: %x", i_reg);
+      }
       else if(pc+d == pc){
         printf("  |   addr: %x, op: %X  <----", pc+d,  temp_op_code);
         d+=2;
@@ -230,6 +276,6 @@ void print_pixel(){
     printf("\n");
   }
 
-  for(int j = 0; j < 100000000; j++){}
+  for(int j = 0; j < 3000000; j++){}
 }
 

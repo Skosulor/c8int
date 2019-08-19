@@ -16,7 +16,7 @@
 #define FONTSET_SIZE   80
 #define NEW_PAGE       120
 
-#define DEBUG 1
+#define DEBUG 0
 
 /* Instruction masking
    0XYN
@@ -29,10 +29,18 @@
 #define GET_Y(X)   ((X & 0x00F0) >> 4)
 #define CF(F)      if(F) V[0xF] = 1; else V[0xF] = 0;
 
+#define TEST1 "test3"
+#define TEST2 "test_opcode.ch8"
+#define TEST3 "PONG"
+#define TEST4 "zerodemo"
+#define TEST5 "pdemo"
+#define TEST6 "trip"
+
 typedef uint8_t bool;
 
 
 /* emulated ram memory */
+uint8_t debug;
 uint8_t memory[RAM_SIZE];
 /* 2048 pixels in total */
 bool pixel[W_PIXELS][H_PIXELS];
@@ -78,7 +86,7 @@ static const uint8_t c8_fontset[80] ={
 };
 
 void init();
-void load_game();
+void load_game(char rom[]);
 void print_memory();
 void fetch_next_op();
 void decode_op();
@@ -87,6 +95,7 @@ void store_regs(uint8_t to_reg);
 void read_regs(uint8_t to_reg);
 void draw_pixels(uint8_t x, uint8_t y, uint8_t n);
 void print_pixel();
+void update_timer();
 
 /* Avoiding f-pointers and giving the switch-statement a cleaner look */
 void case_0();

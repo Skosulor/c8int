@@ -1,21 +1,37 @@
 #include "chip8.h"
 #include <stdio.h>
+#include <string.h>
 
-int main(){
 
+// TODO: add sdl2 support
+
+int main(int argc, char *argv[]){
   int d;
+  for(int i = 0; i < argc; i++){
+    if(strcmp("-d", argv[i]) == 0){
+      debug = 1;
+      break;
+    }
+    else
+      debug = DEBUG;
+  }
+
 
   start: init();
-  load_game();
+  if(argc > 1){
+    load_game(argv[1]);
+  }
+  else
+    load_game(TEST6);
   print_memory();
   d = 0;
 
   while(1){
-
     fetch_next_op();
     decode_op();
+    update_timer();
 
-    if(DEBUG && d == 0){
+    if(debug && d == 0){
       print_pixel();
       while(1){
         printf(">");
@@ -29,26 +45,7 @@ int main(){
         }
       }
     }
-    else if(DEBUG)
+    else if(debug)
       d--;
   }
-
-
-/*   fetch_next_op(); */
-/*   decode_op(); */
-/*   fetch_next_op(); */
-/*   decode_op(); */
-/*   fetch_next_op(); */
-/*   decode_op(); */
-/*   fetch_next_op(); */
-/*   decode_op(); */
-/*   fetch_next_op(); */
-/*   decode_op(); */
-/*   fetch_next_op(); */
-/*   decode_op(); */
-/*   fetch_next_op(); */
-/*   decode_op(); */
-/*   fetch_next_op(); */
-/*   decode_op(); */
-/*   fetch_next_op(); */
 }
