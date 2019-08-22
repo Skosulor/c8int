@@ -4,7 +4,6 @@
 #include <string.h>
 
 
-// TODO: add sdl2 support
 
 int main(int argc, char *argv[]){
   int d;
@@ -29,7 +28,6 @@ int main(int argc, char *argv[]){
   print_memory();
 
   while(1){
-    /* for(int i=0; i<500000; i++){} // Change this to some kind of delay */
     if(tick()){
       fetch_next_op();
       decode_op();

@@ -1,6 +1,3 @@
-// TODO!!! Implement delayed timer, sound timer and keypad
-// also debug the shit out of it
-
 #include <unistd.h>
 #include <stdlib.h>
 #include <time.h>
@@ -224,9 +221,6 @@ void case_F(uint8_t x, uint8_t nn){
 }
 
 void draw_pixels(uint8_t x, uint8_t y, uint8_t n){
-  // draw sprite at coordinate (vx, vy)
-  // height of n, width of 8
-  // pixels read from mem location i_reg
   int i,j;
   bool old_p;
 
@@ -263,10 +257,7 @@ void decode_op(){
   uint8_t  n   = GET_N(op_code);
   uint8_t  nn  = GET_NN(op_code);
   uint16_t nnn = GET_NNN(op_code);
-
   /* printf("pc: %x, op: %x, x: %x, y: %x, nnn: %x, nn: %x, n: %x\n", pc-2, op_code, x, y, nnn, nn, n); */
-
-  /* printf("opcode %X\n", op_code); */
   switch(op_code & 0xF000)
     {
     case 0x0000: case_0();                       break;
@@ -329,7 +320,5 @@ void print_pixel(){
 
     printf("\n");
   }
-
-  /* for(int j = 0; j < 3000000; j++){} */
 }
 
