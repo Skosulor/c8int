@@ -11,8 +11,7 @@ make
 ./c8int ROM_FILE
 #+END_SRC
 
-Default op code execution frequency is 714.
-Default resolution is 800X400
+Default op code execution frequency is 714 Hz. Default resolution is 800X400
 
 Flags:
        - -h [pixels] : horizontal window size (integer)
@@ -20,7 +19,7 @@ Flags:
        - -hz [frequency] : op code execution frequency (integer)
          
 
-Example running  c8int with pong rom at 2000 Hz and resolution 1920X1080
+**** Example running  c8int with pong rom at 2000 Hz and resolution 1920X1080
 #+BEGIN_SRC bash
 ./c8int roms/pong -hz 2000 -w 1920 -h 1080
 #+END_SRC
