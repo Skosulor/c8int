@@ -8,7 +8,7 @@ To compile and run:
 mkdir build && cd build
 cmake ..
 make
-./emu ROM_FILE
+./c8int ROM_FILE
 #+END_SRC
 
 Default op code execution frequency is 714.
