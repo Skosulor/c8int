@@ -15,6 +15,6 @@ Default op code execution frequency is 714.
 Default resolution is 800X400
 
 Flags:
-       -h [pixels] : horizontal window size (integer)
-       -w [pixels] : vertical window size (integer)
-       -hz [frequency] : op code execution frequency (integer)
+       - h [pixels] : horizontal window size (integer)
+       - w [pixels] : vertical window size (integer)
+       - hz [frequency] : op code execution frequency (integer)
