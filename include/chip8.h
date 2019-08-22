@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include "disp.h"
 
 #define FALSE 0
 #define TRUE  1
@@ -43,7 +44,7 @@ typedef uint8_t bool;
 uint8_t debug;
 uint8_t memory[RAM_SIZE];
 /* 2048 pixels in total */
-bool pixel[W_PIXELS][H_PIXELS];
+bool pixel[H_PIXELS][W_PIXELS];
 /* General purpose registers
    Named Vx (V0-VF)
    VF reserved */
@@ -96,11 +97,12 @@ void read_regs(uint8_t to_reg);
 void draw_pixels(uint8_t x, uint8_t y, uint8_t n);
 void print_pixel();
 void update_timer();
+int tick();
 
 /* Avoiding f-pointers and giving the switch-statement a cleaner look */
 void case_0();
 void case_8(uint8_t x, uint8_t y, uint8_t n);
-void case_E();
+void case_E(uint8_t x, uint8_t nn);
 void case_F(uint8_t x, uint8_t nn);
 /* void emulate_cycle(); */
 

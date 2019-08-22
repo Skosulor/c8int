@@ -1,4 +1,3 @@
-
 // TODO!!! Implement delayed timer, sound timer and keypad
 // also debug the shit out of it
 
@@ -6,6 +5,7 @@
 #include <time.h>
 #include <stdio.h>
 #include <sys/time.h>
+#include "disp.h"
 #include "chip8.h"
 
 void load_game(char rom[]){
@@ -42,8 +42,9 @@ void init(){
   }
   srandom(time(NULL));
   clear_display();
-  for(i = 0; i < 16; i++){
+  for(i=0; i<16; i++){
     V[i] = 0;
+    keypad[i] = 0;
   }
 }
 
@@ -67,13 +68,34 @@ void fetch_next_op(){
 
 void clear_display(){
   int i,j;
-  for(i=0; i<W_PIXELS; i++){
-    for(j=0; j<H_PIXELS; j++){
+  for(i=0; i<H_PIXELS; i++){
+    for(j=0; j<W_PIXELS; j++){
       pixel[i][j] = FALSE;
     }
   }
 }
 
+int tick(){
+  static bool first = TRUE;
+  uint64_t delta_us;
+  static struct timespec last_tick, current_time;
+
+  if(first){
+    clock_gettime(CLOCK_MONOTONIC_RAW, &last_tick);
+    first = FALSE;
+  }
+
+  clock_gettime(CLOCK_MONOTONIC_RAW, &current_time);
+  delta_us = (current_time.tv_sec - last_tick.tv_sec) * 1000000 + (current_time.tv_nsec - last_tick.tv_nsec) / 1000;
+  if(delta_us >= 1400){
+    clock_gettime(CLOCK_MONOTONIC_RAW, &last_tick);
+    return 1;
+  }
+  usleep(1);
+  return 0;
+
+
+}
 void update_timer(){
   uint64_t delta_us;
   static struct timespec last, current;
@@ -86,6 +108,7 @@ void update_timer(){
 
     if(delta_us > 16666){
       delay_timer -= 1;
+      sound_timer = 0;
       clock_gettime(CLOCK_MONOTONIC_RAW, &last);
     }
   }
@@ -111,6 +134,7 @@ void case_0(){
 
     default:
       printf("Error, uknown op_code: %X, case_0\n" , op_code);
+      while(1){}
   }
 
 }
@@ -126,11 +150,29 @@ void case_8(uint8_t x, uint8_t y, uint8_t n){
     case 0x6: CF(V[x]&0b0001);         V[x] = V[x] >> 1;   break;
     case 0x7: CF(V[y]>V[x]);           V[x] = V[y] - V[x]; break;
     case 0xE: CF(V[x]&0b1000);         V[x] = V[x] << 1;   break;
+
+    default:
+      printf("Error, uknown op_code: %X, case_0\n" , op_code);
+      while(1){}
     }
 }
 
-void case_E(){     // TODO Rquires input
-  pc +=2;
+void case_E(uint8_t x, uint8_t nn){
+  switch(nn){
+  case 0x9E:
+    if(keypad[V[x]] == TRUE){
+      pc +=2;
+    }
+    break;
+  case 0xA1:
+    if(keypad[V[x]] != TRUE){
+      pc +=2;
+    }
+    break;
+  default:
+    printf("Error, uknown op_code: %X, case_0\n" , op_code);
+    while(1){}
+  }
 }
 
 void get_bcd(uint8_t x){
@@ -165,6 +207,10 @@ void case_F(uint8_t x, uint8_t nn){
     case 0x33: get_bcd(x);            break;
     case 0x55: store_regs(x);         break;
     case 0x65: read_regs(x);          break;
+
+    default:
+      printf("Error, uknown op_code: %X, case_0\n" , op_code);
+      while(1){}
     }
 }
 
@@ -179,7 +225,7 @@ void draw_pixels(uint8_t x, uint8_t y, uint8_t n){
 
   for(i = 0; i < n; i ++){
     for(j = 0; j < 8; j++){
-      old_p = pixel[V[x]+j][V[y]+i];
+      old_p = pixel[V[y]+i][V[x]+j];
 
       if(((memory[i_reg+i]) & (0x80 >> j)) == 0){
         /* pixel[V[x]+j][V[y]+i] = FALSE; */
@@ -188,11 +234,11 @@ void draw_pixels(uint8_t x, uint8_t y, uint8_t n){
       }
       else{
         if(old_p == TRUE){
-          pixel[V[x]+j][V[y]+i] = FALSE;
+          pixel[V[y]+i][V[x]+j] = FALSE;
           V[0xF] = 1;
         }
         else
-          pixel[V[x]+j][V[y]+i] = TRUE;
+          pixel[V[y]+i][V[x]+j] = TRUE;
 
         /* pixel[V[x]+j][V[y]+i] ^= 1; */
         /* if((old_p == 1) && (pixel[V[x]+j][V[y]+i] == 0)) */
@@ -201,7 +247,16 @@ void draw_pixels(uint8_t x, uint8_t y, uint8_t n){
       }
     }
   }
-  print_pixel();
+  /* print_pixel(); */
+  /* for(i=0; i<10000000; i++){} */
+
+  /* for(i=0; i<16; i++){ */
+  /*   if(keypad[i] == TRUE) */
+  /*     printf("Key %d pressed\n", i); */
+  /* } */
+
+  clean_display();
+  draw_display();
 }
 
 void decode_op(){
@@ -213,6 +268,7 @@ void decode_op(){
 
   /* printf("pc: %x, op: %x, x: %x, y: %x, nnn: %x, nn: %x, n: %x\n", pc-2, op_code, x, y, nnn, nn, n); */
 
+  /* printf("opcode %X\n", op_code); */
   switch(op_code & 0xF000)
     {
     case 0x0000: case_0();                       break;
@@ -229,7 +285,7 @@ void decode_op(){
     case 0xB000: pc = V[0] + nnn;                break;
     case 0xC000: V[x] = (random() % 255) & nn;   break;
     case 0xD000: draw_pixels(x,y,n);             break;
-    case 0xE000: case_E();                       break;
+    case 0xE000: case_E(x,nn);                   break;
     case 0xF000: case_F(x,nn);                   break;
     default:
       printf("Error, uknown op_code: %X, main switch\n" , op_code);
@@ -250,7 +306,7 @@ void print_pixel(){
   for(i = 0; i < H_PIXELS; i++){
     for(j = 0; j < W_PIXELS; j++){
 
-      if(pixel[j][i])
+      if(pixel[i][j])
         printf("%c", block);
       else
         printf(" ");
@@ -276,6 +332,6 @@ void print_pixel(){
     printf("\n");
   }
 
-  for(int j = 0; j < 3000000; j++){}
+  /* for(int j = 0; j < 3000000; j++){} */
 }
 

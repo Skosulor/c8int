@@ -3,3 +3,9 @@ PONG
 chip8.o
 emu.o
 output
+roms
+chip8-master
+GPATH 
+GTAGS
+GRTAGS
+build
