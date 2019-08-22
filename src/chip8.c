@@ -97,7 +97,7 @@ int tick(){
     clock_gettime(CLOCK_MONOTONIC_RAW, &last_tick);
     return 1;
   }
-  usleep(100);
+  usleep(20);
   return 0;
 
 

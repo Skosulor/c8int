@@ -1,6 +1,6 @@
 cmake_minimum_required (VERSION 3.7)
-project(chip8-emu
-        DESCRIPTION "Chip-8 e emulator"
+project(c8int
+        DESCRIPTION "Chip-8 e interpreter"
         LANGUAGES   C)
 
 find_package(SDL2 REQUIRED)
@@ -16,8 +16,8 @@ target_include_directories(disp PUBLIC ${SDL2_LIBRARIES})
 
 
 
-add_executable(emu src/emu.c)
-target_link_libraries(emu PUBLIC chip8)
-target_link_libraries(emu PUBLIC disp)
+add_executable(c8int src/c8int.c)
+target_link_libraries(c8int PUBLIC chip8)
+target_link_libraries(c8int PUBLIC disp)
 
 
