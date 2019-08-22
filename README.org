@@ -1,2 +1,11 @@
 * c8emu
-A to be chip-8 emulator. 
+A chip-8 emulator. 
+
+Requires SDL and CMake.
+
+To compile and run:
+#+BEGIN_SRC bash
+mkdir build && cd build
+cmake ..
+./emu ROM_FILE
+#+END_SRC
