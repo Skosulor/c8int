@@ -3,7 +3,6 @@ project(chip8-emu
         DESCRIPTION "Chip-8 e emulator"
         LANGUAGES   C)
 
-set(PROJECT_DIR /home/ohman/project/chip8)
 find_package(SDL2 REQUIRED)
 SET(GCC_COVERAGE_LINK_FLAGS "-lSDL2")
 SET(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} ${GCC_COVERAGE_LINK_FLAGS}")

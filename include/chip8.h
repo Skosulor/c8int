@@ -16,6 +16,7 @@
 #define FONTSET_OFFSET 0x50
 #define FONTSET_SIZE   80
 #define NEW_PAGE       120
+#define HZ_714         1400
 
 #define DEBUG 0
 
@@ -29,6 +30,9 @@
 #define GET_X(X)   ((X & 0x0F00) >> 8)
 #define GET_Y(X)   ((X & 0x00F0) >> 4)
 #define CF(F)      if(F) V[0xF] = 1; else V[0xF] = 0;
+
+#define EQUAL(STR1,STR2,DO) if(!strcmp(STR1,STR2)){DO}
+#define EQUALS(STR1,STR2,DO) else if(!strcmp(STR1,STR2)){DO}
 
 #define TEST1 "test3"
 #define TEST2 "test_opcode.ch8"
@@ -58,14 +62,12 @@ uint16_t pc;
 uint16_t i_reg;
 /* operation */
 uint16_t op_code;
-
-
-/* Updates at 60 Hz */
 uint16_t delay_timer;
 uint16_t sound_timer;
-
 bool keypad[16];
 
+bool update_period_set;
+int update_period_us;
 
 static const uint8_t c8_fontset[80] ={
   0xF0, 0x90, 0x90, 0x90, 0xF0, // 0
@@ -97,6 +99,7 @@ void read_regs(uint8_t to_reg);
 void draw_pixels(uint8_t x, uint8_t y, uint8_t n);
 void print_pixel();
 void update_timer();
+void set_update_freq(char s[]);
 int tick();
 
 /* Avoiding f-pointers and giving the switch-statement a cleaner look */

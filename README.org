@@ -1,11 +1,20 @@
 * c8emu
-A chip-8 emulator. 
+A chip-8 emulator written in C. 
 
-Requires SDL and CMake.
+Requires SDL2 and CMake.
 
 To compile and run:
 #+BEGIN_SRC bash
 mkdir build && cd build
 cmake ..
+make
 ./emu ROM_FILE
 #+END_SRC
+
+Default op code execution frequency is 714.
+Default resolution is 800X400
+
+Flags:
+       -h [pixels] : horizontal window size (integer)
+       -w [pixels] : vertical window size (integer)
+       -hz [frequency] : op code execution frequency (integer)

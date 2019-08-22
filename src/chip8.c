@@ -1,6 +1,7 @@
 // TODO!!! Implement delayed timer, sound timer and keypad
 // also debug the shit out of it
 
+#include <unistd.h>
 #include <stdlib.h>
 #include <time.h>
 #include <stdio.h>
@@ -46,6 +47,8 @@ void init(){
     V[i] = 0;
     keypad[i] = 0;
   }
+  if(!update_period_set)
+    update_period_us = HZ_714;
 }
 
 void print_memory(){
@@ -75,6 +78,12 @@ void clear_display(){
   }
 }
 
+void set_update_freq(char s[]){
+  int hz = atoi(s);
+  update_period_us = 1000000/hz;
+  update_period_set = TRUE;
+}
+
 int tick(){
   static bool first = TRUE;
   uint64_t delta_us;
@@ -87,11 +96,11 @@ int tick(){
 
   clock_gettime(CLOCK_MONOTONIC_RAW, &current_time);
   delta_us = (current_time.tv_sec - last_tick.tv_sec) * 1000000 + (current_time.tv_nsec - last_tick.tv_nsec) / 1000;
-  if(delta_us >= 1400){
+  if(delta_us >= update_period_us){
     clock_gettime(CLOCK_MONOTONIC_RAW, &last_tick);
     return 1;
   }
-  usleep(1);
+  usleep(100);
   return 0;
 
 
@@ -239,22 +248,11 @@ void draw_pixels(uint8_t x, uint8_t y, uint8_t n){
         }
         else
           pixel[V[y]+i][V[x]+j] = TRUE;
-
-        /* pixel[V[x]+j][V[y]+i] ^= 1; */
-        /* if((old_p == 1) && (pixel[V[x]+j][V[y]+i] == 0)) */
-        /*   V[0xF] = 1; */
-
       }
     }
   }
+
   /* print_pixel(); */
-  /* for(i=0; i<10000000; i++){} */
-
-  /* for(i=0; i<16; i++){ */
-  /*   if(keypad[i] == TRUE) */
-  /*     printf("Key %d pressed\n", i); */
-  /* } */
-
   clean_display();
   draw_display();
 }

@@ -9,14 +9,13 @@
 int main(int argc, char *argv[]){
   int d;
 
+  debug = DEBUG;
   for(int i = 0; i < argc; i++){
-    if(strcmp("-d", argv[i]) == 0){
-      debug = 1;
-      break;
-    }
-    else
-      debug = DEBUG;
-  }
+    EQUAL("-d",argv[i], debug = 0;)
+      EQUALS("-h", argv[i],  set_h_pixels(argv[i+1]);)
+      EQUALS("-w", argv[i],  set_w_pixels(argv[i+1]);)
+      EQUALS("-hz", argv[i],  set_update_freq(argv[i+1]);)
+      }
 
   init_window();
   start: init();

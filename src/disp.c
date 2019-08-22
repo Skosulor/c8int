@@ -1,12 +1,24 @@
 #include "disp.h"
 
 void init_window(){
+
+
+  if(!w_set){
+    x_scale_factor = SCALE_TO_W / C8_MAX_WIDTH;
+    window_width = WINDOW_WIDTH;
+  }
+  if(!h_set){
+    y_scale_factor = SCALE_TO_H / C8_MAX_HEIGHT;
+    window_height = WINDOW_HEIGHT;
+  }
+
+
   window = SDL_CreateWindow(
     "SDL2Test",
     SDL_WINDOWPOS_UNDEFINED,
     SDL_WINDOWPOS_UNDEFINED,
-    WINDOW_WIDTH,
-    WINDOW_HEIGHT,
+    window_width,
+    window_height,
     0
     );
 
@@ -14,16 +26,23 @@ void init_window(){
   SDL_SetRenderDrawColor(renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);
   SDL_RenderPresent(renderer);
 
-  x_scale_factor = SCALE_TO_W / C8_MAX_WIDTH;
-  y_scale_factor = SCALE_TO_H / C8_MAX_HEIGHT;
 
+}
 
+void set_h_pixels(char s[]){
+  window_height = atoi(s);
+  y_scale_factor = window_height / C8_MAX_HEIGHT;
+  h_set = TRUE;
+}
+void set_w_pixels(char s[]){
+  window_width = atoi(s);
+  x_scale_factor = window_width / C8_MAX_WIDTH;
+  w_set = TRUE;
 }
 
 void draw_display(){
 
-  x_scale_factor = SCALE_TO_W / C8_MAX_WIDTH;
-  y_scale_factor = SCALE_TO_H / C8_MAX_HEIGHT;
+
   SDL_Rect rect;
   rect.w = x_scale_factor;
   rect.h = y_scale_factor;
