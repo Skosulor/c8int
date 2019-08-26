@@ -10,7 +10,7 @@ int main(int argc, char *argv[]){
 
   debug = DEBUG;
   for(int i = 0; i < argc; i++){
-    EQUAL("-d",argv[i], debug = 0;)
+      EQUAL("-d",argv[i], debug = TRUE;)
       EQUALS("-h", argv[i],  set_h_pixels(argv[i+1]);)
       EQUALS("-w", argv[i],  set_w_pixels(argv[i+1]);)
       EQUALS("-hz", argv[i],  set_update_freq(argv[i+1]);)
@@ -51,7 +51,9 @@ int main(int argc, char *argv[]){
         }
       }
     }
-    else if(debug)
+    else if(debug){
+      print_pixel();
       d--;
+    }
   }
 }

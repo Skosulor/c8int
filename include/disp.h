@@ -34,4 +34,5 @@ void test_disp();
 void test_window();
 void clean_display();
 void draw_display();
+void destroy_window();
 #endif

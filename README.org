@@ -11,6 +11,8 @@ make
 ./c8int ROM_FILE
 #+END_SRC
 
+In "test" there is a test ROM which test most of the chip8's instructions.
+
 **** Flags:
        - -h [pixels] : horizontal window size (integer)
        - -w [pixels] : vertical window size (integer)

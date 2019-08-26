@@ -113,3 +113,7 @@ int handle_event(){
   else
     return 0;
 }
+void destroy_window(){
+  SDL_DestroyWindow(window);
+  SDL_Quit();
+}

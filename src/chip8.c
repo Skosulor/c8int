@@ -9,7 +9,6 @@
 void load_game(char rom[]){
   uint16_t mem_ptr = 0;
   FILE *fptr;
-  /* char game_file[30] = TEST6; */
   char ch;
 
   fptr = fopen(rom, "rb");
@@ -19,7 +18,6 @@ void load_game(char rom[]){
     exit(0);
   }
 
-  size_t n_bytes;
   n_bytes = fread(memory + 0x200, sizeof(uint8_t), RAM_SIZE, fptr);
 
   printf("%d Instructions loaded into memory\n", n_bytes/2);
@@ -31,6 +29,7 @@ void init(){
   for(i = 0; i < RAM_SIZE; i++){
     memory[i] = 0;
   }
+
   pc = PROGRAM_START;
   i_reg = 0;
   op_code = 0;
@@ -52,7 +51,7 @@ void print_memory(){
   int i;
   op_code = 0xFFFF;
   printf("--- Loaded Instructions ---\n");
-  while(op_code != 0000){
+  for(i=0; i<n_bytes/2;i++){
     fetch_next_op();
     printf("%x: %X\n", pc-2, op_code);
   }
@@ -62,7 +61,6 @@ void print_memory(){
 
 void fetch_next_op(){
   op_code = (memory[pc] << 8) | memory[pc+1];
-  /* printf("pc: %x, op: %X\n", pc, op_code); */
   pc += 2;
 }
 
@@ -127,20 +125,18 @@ void update_timer(){
 void case_0(){
   switch(op_code & 0x00FF)
     {
-    case 0x00E0:
-      clear_display();
-      break;
-
+    case 0x00E0: clear_display(); break;
     case 0x00EE:
-      if(sp == 0)
-        printf("Error: Stackpointer < 0");
+      if(sp <= 0){printf("Error: Stackpointer < 0");}
       sp--;
       pc = stack[sp];
       break;
 
     default:
       printf("Error, uknown op_code: %X, case_0\n" , op_code);
-      while(1){}
+      while(1){
+        destroy_window();
+      }
   }
 
 }
@@ -153,13 +149,15 @@ void case_8(uint8_t x, uint8_t y, uint8_t n){
     case 0x3: V[x]  = V[x] ^ V[y]; break;
     case 0x4: CF(V[x]>UINT8_MAX-V[y]); V[x] += V[y];       break;
     case 0x5: CF(V[x]>V[y]);           V[x] -= V[y];       break;
-    case 0x6: CF(V[x]&0b0001);         V[x] = V[x] >> 1;   break;
+    case 0x6: CF(V[x]&0b00000001);     V[x] = V[x] >> 1;   break;
     case 0x7: CF(V[y]>V[x]);           V[x] = V[y] - V[x]; break;
-    case 0xE: CF(V[x]&0b1000);         V[x] = V[x] << 1;   break;
+    case 0xE: CF(V[x]&0b10000000);     V[x] = V[x] << 1;   break;
 
     default:
       printf("Error, uknown op_code: %X, case_0\n" , op_code);
-      while(1){}
+      while(1){
+        destroy_window();
+      }
     }
 }
 
@@ -177,7 +175,9 @@ void case_E(uint8_t x, uint8_t nn){
     break;
   default:
     printf("Error, uknown op_code: %X, case_0\n" , op_code);
-    while(1){}
+    while(1){
+      destroy_window();
+    }
   }
 }
 
@@ -201,11 +201,28 @@ void read_regs(uint8_t to_reg){
   }
 }
 
+void wait_keypress(uint8_t x){
+  bool brk = FALSE;
+  while(1){
+    usleep(10);
+    handle_event();
+    for(int i=0; i<16; i++){
+      if(keypad[i] == TRUE){
+        V[x] = i;
+        brk = TRUE;
+        break;
+      }
+    }
+    if(brk)
+      break;
+  }
+}
+
 void case_F(uint8_t x, uint8_t nn){
   switch(nn)
     {
     case 0x07: V[x] = delay_timer;    break;
-    case 0x0A: break; // TODO wait for keypress, delay all execution
+    case 0x0A: wait_keypress(x);      break;
     case 0x15: delay_timer = V[x];    break;
     case 0x18: sound_timer = V[x];    break;
     case 0x1E: i_reg = i_reg + V[x];  break;
@@ -216,13 +233,19 @@ void case_F(uint8_t x, uint8_t nn){
 
     default:
       printf("Error, uknown op_code: %X, case_0\n" , op_code);
-      while(1){}
+      while(1){
+        destroy_window();
+      }
     }
 }
 
 void draw_pixels(uint8_t x, uint8_t y, uint8_t n){
   int i,j;
   bool old_p;
+
+  if(debug){
+    printf("Draw pixels at x: %d, y: %d\n", V[x], V[y]);
+  }
 
   V[0xF] = 0;
 
@@ -231,9 +254,10 @@ void draw_pixels(uint8_t x, uint8_t y, uint8_t n){
       old_p = pixel[V[y]+i][V[x]+j];
 
       if(((memory[i_reg+i]) & (0x80 >> j)) == 0){
-        /* pixel[V[x]+j][V[y]+i] = FALSE; */
-        if(old_p == TRUE)
-          V[0xF] = 1;
+        pixel[V[y]+i][V[x]+j] = FALSE;
+        if(old_p == TRUE){
+          pixel[V[y]+i][V[x]+j] = TRUE;
+        }
       }
       else{
         if(old_p == TRUE){
@@ -278,7 +302,9 @@ void decode_op(){
     case 0xF000: case_F(x,nn);                   break;
     default:
       printf("Error, uknown op_code: %X, main switch\n" , op_code);
-      while(1){}
+      while(1){
+        destroy_window();
+      }
     }
 }
 
@@ -309,7 +335,7 @@ void print_pixel(){
         printf("  |   I reg: %x", i_reg);
       }
       else if(pc+d == pc){
-        printf("  |   addr: %x, op: %X  <----", pc+d,  temp_op_code);
+        printf("  |   addr: %x, op: %X <- PC; SP: %d", pc+d,  temp_op_code, sp);
         d+=2;
         }
       else{

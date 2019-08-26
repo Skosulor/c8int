@@ -1,3 +1,5 @@
+#include <stdint.h>
+
 #ifndef CHIP8_H
 #define CHIP8_H
 
@@ -68,6 +70,7 @@ bool keypad[16];
 
 bool update_period_set;
 int update_period_us;
+size_t n_bytes;
 
 static const uint8_t c8_fontset[80] ={
   0xF0, 0x90, 0x90, 0x90, 0xF0, // 0
@@ -100,6 +103,7 @@ void draw_pixels(uint8_t x, uint8_t y, uint8_t n);
 void print_pixel();
 void update_timer();
 void set_update_freq(char s[]);
+void wait_keypress(uint8_t x);
 int tick();
 
 /* Avoiding f-pointers and giving the switch-statement a cleaner look */
