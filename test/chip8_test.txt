@@ -2,7 +2,7 @@
 6900 6E00 6000 3001 3000 1392 7E01
 6001 4001 4000 1392 7E01 
 6101 6200 5020 5010 1392 7E01 
-7002 70FF 3F00 1392 3002 1500 7E01  //%
+7002 70FF 3F00 1392 3002 1500 7E01  
 6BF0 8CB0 5CB0 1392 7E01
 6A0F 6BF0 8AB1 3AFF 1392 7E01
 6A0F 6BF1 8AB2 3A01 1392 7E01
@@ -27,6 +27,9 @@ FA07 4AFF 1392 7E01
 00E0 F929 6510 6419 D455 6F00 
 FE29 6510 6420 D455 6F00 13a8
 
+HOW TO:
+  If a number is displayed you got an error with the corresponding instruction
+  below. If an "OK" is displayed your interperator have passed the test. 
 
 TEST ORDER
 0: 3XNN
@@ -52,7 +55,7 @@ TEST ORDER
 19: FX1E
 
 create bin:
-  xdd -r -p in flowtest1
+  xdd -r -p chip8_test.txt c8_test.c8
 
 NOT TESTED: 0NNN
             00E0
