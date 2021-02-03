@@ -27,6 +27,12 @@ FA07 4AFF 1392 7E01
 00E0 F929 6510 6419 D455 6F00 
 FE29 6510 6420 D455 6F00 13a8
 
+****************************************  
+*                Made by               *   
+*       https://github.com/Skosulor    *
+****************************************
+
+
 HOW TO:
   If a number is displayed you got an error with the corresponding instruction
   below. If an "OK" is displayed your interperator have passed the test. 
