@@ -1,7 +1,7 @@
 #ifndef DISP_H
 #define DISP_H
 #include <stdio.h>
-#include "SDL2/SDL.h"
+#include "SDL.h"
 #include "chip8.h"
 
 #define WINDOW_WIDTH  800
