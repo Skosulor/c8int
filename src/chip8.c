@@ -20,7 +20,7 @@ void load_game(char rom[]){
 
   n_bytes = fread(memory + 0x200, sizeof(uint8_t), RAM_SIZE, fptr);
 
-  printf("%d Instructions loaded into memory\n", n_bytes/2);
+  printf("%zu Instructions loaded into memory\n", n_bytes/2);
   fclose(fptr);
 }
 
