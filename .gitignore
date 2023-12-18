@@ -9,3 +9,9 @@ GPATH
 GTAGS
 GRTAGS
 build
+/tags
+/c8int
+/.DS_Store
+/.ccls-cache/
+/.cmake/
+/.dir-locals.el
