@@ -137,7 +137,7 @@ void case_0(){
       while(1){
         destroy_window();
       }
-  }
+    }
 
 }
 void case_8(uint8_t x, uint8_t y, uint8_t n){
@@ -337,7 +337,7 @@ void print_pixel(){
       else if(pc+d == pc){
         printf("  |   addr: %x, op: %X <- PC; SP: %d", pc+d,  temp_op_code, sp);
         d+=2;
-        }
+      }
       else{
         printf("  |   addr: %x, op: %X", pc+d,  temp_op_code);
         d+=2;
