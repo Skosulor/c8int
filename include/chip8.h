@@ -45,32 +45,10 @@
 
 typedef uint8_t bool;
 
-
-/* emulated ram memory */
-uint8_t debug;
-uint8_t memory[RAM_SIZE];
-/* 2048 pixels in total */
-bool pixel[H_PIXELS][W_PIXELS];
-/* General purpose registers
-   Named Vx (V0-VF)
-   VF reserved */
-uint8_t  V[16];
-uint16_t stack[16];
-/* stack pointer */
-uint8_t  sp;
-/* Memory size is 4KB and needs a 16-bit pc */
-uint16_t pc;
-/* Index register */
-uint16_t i_reg;
-/* operation */
-uint16_t op_code;
-uint16_t delay_timer;
-uint16_t sound_timer;
-bool keypad[16];
-
-bool update_period_set;
-int update_period_us;
-size_t n_bytes;
+extern uint8_t debug;
+extern uint8_t memory[RAM_SIZE];
+extern bool pixel[H_PIXELS][W_PIXELS];
+extern bool keypad[16];
 
 static const uint8_t c8_fontset[80] ={
   0xF0, 0x90, 0x90, 0x90, 0xF0, // 0

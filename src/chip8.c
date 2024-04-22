@@ -6,6 +6,30 @@
 #include "disp.h"
 #include "chip8.h"
 
+uint8_t debug;
+uint8_t memory[RAM_SIZE];
+bool pixel[H_PIXELS][W_PIXELS];
+/* General purpose registers
+   Named Vx (V0-VF)
+   VF reserved */
+uint8_t  V[16];
+uint16_t stack[16];
+// stack pointer
+uint8_t  sp;
+/* Memory size is 4KB and needs a 16-bit pc */
+uint16_t pc;
+/* Index register */
+uint16_t i_reg;
+uint16_t op_code;
+uint16_t delay_timer;
+uint16_t sound_timer;
+bool keypad[16];
+bool update_period_set;
+int update_period_us;
+size_t n_bytes;
+
+
+
 void load_game(char rom[]){
   uint16_t mem_ptr = 0;
   FILE *fptr;

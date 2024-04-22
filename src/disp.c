@@ -1,8 +1,22 @@
 #include "disp.h"
+#include <threads.h>
+
+SDL_Window *window;
+SDL_Renderer *renderer;
+SDL_Event e;
+
+int x_scale_factor;
+int y_scale_factor;
+
+bool w_set;
+bool h_set;
+int window_width;
+int window_height;
+
+
 
 void init_window(){
-
-
+  
   if(!w_set){
     x_scale_factor = SCALE_TO_W / C8_MAX_WIDTH;
     window_width = WINDOW_WIDTH;
@@ -41,7 +55,6 @@ void set_w_pixels(char s[]){
 }
 
 void draw_display(){
-
 
   SDL_Rect rect;
   rect.w = x_scale_factor;
@@ -90,6 +103,7 @@ int handle_event(){
       SDL_Quit();
       return 1;
       break;
+
 
     case SDLK_KP_0: keypad[0]  = down; break;
     case SDLK_KP_1: keypad[1]  = down; break;
