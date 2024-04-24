@@ -165,17 +165,18 @@ void case_0(){
 
 }
 void case_8(uint8_t x, uint8_t y, uint8_t n){
+  bool tmp;
   switch(n)
     {
-    case 0x0: V[x]  = V[y];        break;
-    case 0x1: V[x]  = V[x] | V[y]; break;
-    case 0x2: V[x]  = V[x] & V[y]; break;
-    case 0x3: V[x]  = V[x] ^ V[y]; break;
-    case 0x4: CF(V[x]>UINT8_MAX-V[y]); V[x] += V[y];       break;
-    case 0x5: CF(V[x]>V[y]);           V[x] -= V[y];       break;
-    case 0x6: CF(V[x]&0b00000001);     V[x] = V[x] >> 1;   break;
-    case 0x7: CF(V[y]>V[x]);           V[x] = V[y] - V[x]; break;
-    case 0xE: CF(V[x]&0b10000000);     V[x] = V[x] << 1;   break;
+    case 0x0: V[x] = V[y];        break;
+    case 0x1: V[x] = V[x] | V[y]; break;
+    case 0x2: V[x] = V[x] & V[y]; break;
+    case 0x3: V[x] = V[x] ^ V[y]; break;
+    case 0x4: tmp = V[x]>UINT8_MAX-V[y]; V[x] += V[y]      ; CF(tmp); break;
+    case 0x5: tmp = V[x]>=V[y]         ; V[x] -= V[y]      ; CF(tmp); break;
+    case 0x6: tmp = V[y]&0b00000001    ; V[x] = V[y] >> 1  ; CF(tmp); break;
+    case 0x7: tmp = V[y]>V[x]          ; V[x] = V[y] - V[x]; CF(tmp); break;
+    case 0xE: tmp = V[y]&0b10000000    ; V[x] = V[y] << 1  ; CF(tmp); break;
 
     default:
       printf("Error, uknown op_code: %X, case_0\n" , op_code);
@@ -188,12 +189,12 @@ void case_8(uint8_t x, uint8_t y, uint8_t n){
 void case_E(uint8_t x, uint8_t nn){
   switch(nn){
   case 0x9E:
-    if(keypad[V[x]] == TRUE){
+    if(keypad[V[x] & 0x0F] == TRUE){
       pc +=2;
     }
     break;
   case 0xA1:
-    if(keypad[V[x]] != TRUE){
+    if(keypad[V[x] & 0xF] != TRUE){
       pc +=2;
     }
     break;
