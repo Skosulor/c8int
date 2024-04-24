@@ -104,23 +104,22 @@ int handle_event(){
       return 1;
       break;
 
-
-    case SDLK_KP_0: keypad[0]  = down; break;
-    case SDLK_KP_1: keypad[1]  = down; break;
-    case SDLK_KP_2: keypad[2]  = down; break;
-    case SDLK_KP_3: keypad[3]  = down; break;
-    case SDLK_KP_4: keypad[4]  = down; break;
-    case SDLK_KP_5: keypad[5]  = down; break;
-    case SDLK_KP_6: keypad[6]  = down; break;
-    case SDLK_KP_7: keypad[7]  = down; break;
-    case SDLK_KP_8: keypad[8]  = down; break;
-    case SDLK_KP_9: keypad[9]  = down; break;
-    case SDLK_a:    keypad[10] = down; break;
-    case SDLK_s:    keypad[11] = down; break;
-    case SDLK_d:    keypad[12] = down; break;
-    case SDLK_f:    keypad[13] = down; break;
-    case SDLK_g:    keypad[14] = down; break;
-    case SDLK_h:    keypad[15] = down; break;
+    case SDLK_0: keypad[0]  = down; break;
+    case SDLK_1: keypad[1]  = down; break;
+    case SDLK_2: keypad[2]  = down; break;
+    case SDLK_3: keypad[3]  = down; break;
+    case SDLK_4: keypad[4]  = down; break;
+    case SDLK_5: keypad[5]  = down; break;
+    case SDLK_6: keypad[6]  = down; break;
+    case SDLK_7: keypad[7]  = down; break;
+    case SDLK_8: keypad[8]  = down; break;
+    case SDLK_9: keypad[9]  = down; break;
+    case SDLK_a: keypad[10] = down; break;
+    case SDLK_s: keypad[11] = down; break;
+    case SDLK_d: keypad[12] = down; break;
+    case SDLK_f: keypad[13] = down; break;
+    case SDLK_g: keypad[14] = down; break;
+    case SDLK_h: keypad[15] = down; break;
     }
     return 0;
   }
