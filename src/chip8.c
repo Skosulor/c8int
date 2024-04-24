@@ -42,7 +42,7 @@ void load_game(char rom[]){
     exit(0);
   }
 
-  n_bytes = fread(memory + 0x200, sizeof(uint8_t), RAM_SIZE, fptr);
+  n_bytes = fread(memory + RESERVED_RAM, sizeof(uint8_t), RAM_SIZE - RESERVED_RAM, fptr);
 
   printf("%zu Instructions loaded into memory\n", n_bytes/2);
   fclose(fptr);
@@ -320,7 +320,7 @@ void decode_op(){
     case 0x9000: if(V[x] != V[y]){ pc+=2; }      break;
     case 0xA000: i_reg = nnn;                    break;
     case 0xB000: pc = V[0] + nnn;                break;
-    case 0xC000: V[x] = (random() % 255) & nn;   break;
+    case 0xC000: V[x] = (random() % 256) & nn;   break;
     case 0xD000: draw_pixels(x,y,n);             break;
     case 0xE000: case_E(x,nn);                   break;
     case 0xF000: case_F(x,nn);                   break;

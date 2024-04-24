@@ -12,6 +12,7 @@
 #define TRUE  1
 
 #define RAM_SIZE       0xFFF
+#define RESERVED_RAM   0x200
 #define PROGRAM_START  0x200
 #define W_PIXELS       64
 #define H_PIXELS       32
