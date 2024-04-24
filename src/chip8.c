@@ -157,7 +157,7 @@ void case_0(){
       break;
 
     default:
-      printf("Error, uknown op_code: %X, case_0\n" , op_code);
+      printf("Error, unknown op_code: %X, case_0\n" , op_code);
       while(1){
         destroy_window();
       }
