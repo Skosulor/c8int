@@ -271,32 +271,48 @@ void draw_pixels(uint8_t x, uint8_t y, uint8_t n){
     printf("Draw pixels at x: %d, y: %d\n", V[x], V[y]);
   }
 
-  V[0xF] = 0;
 
   for(i = 0; i < n; i ++){
     for(j = 0; j < 8; j++){
-      old_p = pixel[V[y]+i][V[x]+j];
+      old_p = get_pixel(V[y]+i, V[x]+j);
 
       if(((memory[i_reg+i]) & (0x80 >> j)) == 0){
-        pixel[V[y]+i][V[x]+j] = FALSE;
+          set_pixel(V[y]+i,V[x]+j, FALSE);
         if(old_p == TRUE){
-          pixel[V[y]+i][V[x]+j] = TRUE;
+          set_pixel(V[y]+i,V[x]+j, TRUE);
         }
       }
       else{
         if(old_p == TRUE){
-          pixel[V[y]+i][V[x]+j] = FALSE;
+          set_pixel(V[y]+i,V[x]+j, FALSE);
           V[0xF] = 1;
         }
-        else
-          pixel[V[y]+i][V[x]+j] = TRUE;
+        else{
+          set_pixel(V[y]+i,V[x]+j, TRUE);
+          V[0xF] = 0;
+        }
       }
     }
   }
 
-  /* print_pixel(); */
   clean_display();
   draw_display();
+}
+
+void set_pixel(int x_coordinate, int y_coordinate, bool value)
+{
+  if(x_coordinate <= H_PIXELS && y_coordinate <= W_PIXELS ){
+    pixel[x_coordinate][y_coordinate] = value;     
+  }
+}
+
+bool get_pixel(int x_coordinate, int y_coordinate)
+{
+  bool pix = FALSE;
+  if(x_coordinate <= H_PIXELS && y_coordinate <= W_PIXELS ){
+    pix = pixel[x_coordinate][y_coordinate]; 
+  }
+  return pix;
 }
 
 void decode_op(){
@@ -305,7 +321,7 @@ void decode_op(){
   uint8_t  n   = GET_N(op_code);
   uint8_t  nn  = GET_NN(op_code);
   uint16_t nnn = GET_NNN(op_code);
-  /* printf("pc: %x, op: %x, x: %x, y: %x, nnn: %x, nn: %x, n: %x\n", pc-2, op_code, x, y, nnn, nn, n); */
+
   switch(op_code & 0xF000)
     {
     case 0x0000: case_0();                       break;
