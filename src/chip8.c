@@ -266,54 +266,35 @@ void case_F(uint8_t x, uint8_t nn){
 
 void draw_pixels(uint8_t x, uint8_t y, uint8_t n){
   int i,j;
-  bool old_p;
+  bool set_VF = FALSE;
 
   if(debug){
     printf("Draw pixels at x: %d, y: %d\n", V[x], V[y]);
   }
 
-
   for(i = 0; i < n; i ++){
     for(j = 0; j < 8; j++){
-      old_p = get_pixel(V[y]+i, V[x]+j);
 
-      if(((memory[i_reg+i]) & (0x80 >> j)) == 0){
-          set_pixel(V[y]+i,V[x]+j, FALSE);
-        if(old_p == TRUE){
-          set_pixel(V[y]+i,V[x]+j, TRUE);
-        }
-      }
-      else{
-        if(old_p == TRUE){
-          set_pixel(V[y]+i,V[x]+j, FALSE);
-          V[0xF] = 1;
-        }
-        else{
-          set_pixel(V[y]+i,V[x]+j, TRUE);
-          V[0xF] = 0;
-        }
-      }
+      uint8_t x_cord = V[y]+i % (H_PIXELS + 1);
+      uint8_t y_cord = V[x]+j % (W_PIXELS + 1);
+
+      bool old_p     = pixel[x_cord][y_cord];
+      bool current_p = ((memory[i_reg+i]) & (0x80 >> j)) > 0;
+      bool res       = old_p ^ current_p;
+
+      pixel[x_cord][y_cord] = res;
+      if(old_p == TRUE && res == 0)
+          set_VF = TRUE;
     }
   }
 
+  if(set_VF)
+      V[0xF] = 0x1;
+  else
+      V[0xF] = 0x0;
+
   clean_display();
   draw_display();
-}
-
-void set_pixel(int x_coordinate, int y_coordinate, bool value)
-{
-  if(x_coordinate <= H_PIXELS && y_coordinate <= W_PIXELS ){
-    pixel[x_coordinate][y_coordinate] = value;     
-  }
-}
-
-bool get_pixel(int x_coordinate, int y_coordinate)
-{
-  bool pix = FALSE;
-  if(x_coordinate <= H_PIXELS && y_coordinate <= W_PIXELS ){
-    pix = pixel[x_coordinate][y_coordinate]; 
-  }
-  return pix;
 }
 
 void decode_op(){

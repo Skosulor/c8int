@@ -79,8 +79,6 @@ void clear_display();
 void store_regs(uint8_t to_reg);
 void read_regs(uint8_t to_reg);
 void draw_pixels(uint8_t x, uint8_t y, uint8_t n);
-bool get_pixel(int x_coordinate, int y_coordinate);
-void set_pixel(int x_coordinate, int y_coordinate, bool value);
 void print_pixel();
 void update_timer();
 void set_update_freq(char s[]);
